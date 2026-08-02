@@ -40,9 +40,10 @@ load_dotenv(override=True)
 if os.getenv("ANTHROPIC_BASE_URL"): os.environ.pop("ANTHROPIC_AUTH_TOKEN", None)
 
 WORKDIR = Path.cwd()
-MEMORY_DIR = WORKDIR / ".memory"; MEMORY_DIR.mkdir(exist_ok=True)
+MEMORY_DIR = WORKDIR / ".memory"
+MEMORY_DIR.mkdir(exist_ok=True)
 MEMORY_INDEX = MEMORY_DIR / "MEMORY.md"
-SKILLS_DIR = WORKDIR / "skills"
+SKILLS_DIR = WORKDIR.parent / "skills"
 TRANSCRIPT_DIR = WORKDIR / ".transcripts"
 TOOL_RESULTS_DIR = WORKDIR / ".task_outputs" / "tool-results"
 client = Anthropic(base_url=os.getenv("ANTHROPIC_BASE_URL"))

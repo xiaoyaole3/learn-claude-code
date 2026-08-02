@@ -55,7 +55,7 @@ def assemble_system_prompt(context: dict) -> str:
     tools = ", ".join(context.get("enabled_tools", []))
     if tools:
         sections.append(f"Available tools: {tools}.")
-    sections.append(f"Working directory: {context.get("workspace", WORKDIR)}")
+    sections.append(f"Working directory: {context.get('workspace', WORKDIR)}")
 
     # Conditional — memory loaded when MEMORY.md exists and has content
     memories = context.get("memories", "")

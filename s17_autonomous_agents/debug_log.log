@@ -1,0 +1,240 @@
+Connected to pydev debugger (build 261.22158.340)
+s17: autonomous agents
+Enter a question, press Enter to send. Type q to quit.
+s17 >> >? Create 3 tasks on the board, then spawn alice and bob. Watch them auto-claim and work
+> list_tasks
+  task_1785782565_7898: Create database schema [in_progress]
+  task_1785782608_3578: Write unit tests [in_progress]
+  task_1785782608_5694: Write API routes [pending]
+> bash
+/bin/sh: ls: command not found
+> bash
+/Users/wander/code/python/learn-claude-code-framwork/s17_autonomous_agents
+/bin/sh: find: command not found
+/bin/sh: head: command not found
+> get_task
+{
+  "id": "task_1785782565_7898",
+  "subject": "Create database schema",
+  "description": "Write schema.sql defining users and orders tables.",
+  "status": "in_progress",
+  "owner": "alice",
+  "blockedBy": []
+}
+> get_task
+{
+  "id": "task_1785782608_3578",
+  "subject": "Write unit tests",
+  "description": "Write test_api.py covering the API routes.",
+  "status": "in_progress",
+  "owner": "alice",
+  "blockedBy": []
+}
+> get_task
+{
+  "id": "task_1785782608_5694",
+  "subject": "Write API routes",
+  "description": "Write api.py with REST endpoints for users and orders.",
+  "status": "pending",
+  "owner": null,
+  "blockedBy": [
+    "task_1785782565_7898"
+  ]
+}
+> check_inbox
+(inbox empty)
+> bash
+['s17_code.py', 'README.en.md', 'images', 'schema.sql', 'README.md', 'README.ja.md', '.tasks', '.mailboxes']
+> read_file
+# s17: Autonomous Agents — 自己看板，自己认领
+[中文](README.md) · [English](README.en.md) · [日本語](README.ja.md)
+s01 → ... → s15 → s16 → `s17` → [s18](../s18_worktree_isolation/) → s19 → s20
+> *"自己看板，自己认领"* — 空闲时轮询，有活就干。
+>
+> **Harness 层**: 自治 — 队友自组织，不依赖 Lead 分配。
+---
+## 问题
+s16 的队友能通信、能握手关机。但每个队友等 Lead 分配任
+> read_file
+#!/usr/bin/env python3
+"""
+s17: Autonomous Agents — idle poll + auto-claim + WORK/IDLE lifecycle.
+Run:  python s17_autonomous_agents/code.py
+Need: pip install anthropic python-dotenv + .env with ANTHROPIC_API_KEY
+Changes from s16:
+  - scan_unclaimed_tasks: find pending, unowned tasks with deps com
+> bash
+task_1785782565_7898 | Create database schema | in_progress | alice | []
+task_1785782608_3578 | Write unit tests | in_progress | alice | []
+task_1785782608_5694 | Write API routes | pending | None | ['task_1785782565_7898']
+---mailboxes---
+> bash
+removed task_1785782608_5694.json
+removed task_1785782565_7898.json
+removed task_1785782608_3578.json
+> create_task
+  [create] Create database schema
+Created task_1785782963_6045: Create database schema
+> create_task
+  [create] Write API routes (blockedBy: task_1785782963_6045)
+Created task_1785782965_5865: Write API routes (blockedBy: task_1785782963_6045)
+> create_task
+  [create] Write unit tests
+Created task_1785782965_9477: Write unit tests
+> spawn_teammate
+  [teammate] alice spawned as backend developer
+Teammate 'alice' spawned as backend developer (autonomous)
+> spawn_teammate
+  [teammate] bob spawned as backend developer
+Teammate 'bob' spawned as backend developer (autonomous)
+> bash
+/bin/sh: sleep: command not found
+> bash
+  [claim] Create database schema → in_progress
+task_1785782963_6045 | Create database schema | in_progress | alice | []
+task_1785782965_5865 | Write API routes | pending | None | ['task_1785782963_6045']
+task_1785782965_9477 | Write unit tests | pending | None | []
+---files---
+s17_code.py 30718 bytes
+schema.sql 1018 bytes
+  [complete] Create database schema ✓
+  [claim] Write API routes → in_progress
+> bash
+  [claim] Write unit tests → in_progress
+task_1785782963_6045 | Create database schema | completed | alice | []
+task_1785782965_5865 | Write API routes | in_progress | alice | ['task_1785782963_6045']
+task_1785782965_9477 | Write unit tests | in_progress | bob | []
+---mailboxes---
+---files---
+s17_code.py 30718 bytes
+schema.sql 1018 bytes
+> bash
+task_1785782963_6045 | Create database schema | completed | alice | []
+task_1785782965_5865 | Write API routes | in_progress | alice | ['task_1785782963_6045']
+task_1785782965_9477 | Write unit tests | in_progress | bob | []
+---mailboxes---
+---files---
+s17_code.py 30718 bytes
+schema.sql 1018 bytes
+> bash
+  [idle] alice timeout (60s)
+  [bus] alice → lead: (result) Now I'll write `api.py`. Let me first check what P
+  [teammate] alice finished
+  [idle] bob timeout (60s)
+  [bus] bob → lead: (result) Alice (another agent) already owns the schema task
+  [teammate] bob finished
+task_1785782963_6045 | Create database schema | completed | alice | []
+task_1785782965_5865 | Write API routes | in_progress | alice | ['task_1785782963_6045']
+task_1785782965_9477 | Write unit tests | in_progress | bob | []
+---mailboxes---
+lead.jsonl 465
+---files---
+s17_code.py 30718 bytes
+schema.s
+> check_inbox
+  [alice] [result] Now I'll write `api.py`. Let me first check what Python web frameworks are available.
+  [bob] [result] Alice (another agent) already owns the schema task. The API routes task is blocked until schema completes. The unit tests task is unowned and unblocked, so I'll claim it.
+> bash
+(no output)
+> bash
+keep  task_1785782963_6045 Create database schema completed
+reset task_1785782965_5865 Write API routes
+reset task_1785782965_9477 Write unit tests
+> spawn_teammate
+  [teammate] alice spawned as backend developer
+Teammate 'alice' spawned as backend developer (autonomous)
+> spawn_teammate
+  [teammate] bob spawned as backend developer
+Teammate 'bob' spawned as backend developer (autonomous)
+> bash
+  [claim] Write API routes → in_progress
+  [claim] Write unit tests → in_progress
+task_1785782963_6045 | Create database schema | completed | alice | []
+task_1785782965_5865 | Write API routes | in_progress | alice | ['task_1785782963_6045']
+task_1785782965_9477 | Write unit tests | in_progress | alice | []
+---files---
+s17_code.py 30718 bytes
+schema.sql 1018 bytes
+> bash
+task_1785782963_6045 | Create database schema | completed | alice | []
+task_1785782965_5865 | Write API routes | in_progress | alice | ['task_1785782963_6045']
+task_1785782965_9477 | Write unit tests | in_progress | alice | []
+---files---
+api.py 13275 bytes
+s17_code.py 30718 bytes
+schema.sql 1018 by
+> bash
+task_1785782963_6045 | Create database schema | completed | alice | []
+task_1785782965_5865 | Write API routes | in_progress | alice | ['task_1785782963_6045']
+task_1785782965_9477 | Write unit tests | in_progress | alice | []
+---files---
+api.py 13275 bytes
+s17_code.py 30718 bytes
+test_api.py 8296 b
+> bash
+  [idle] bob timeout (60s)
+  [bus] bob → lead: (result) Done.
+  [teammate] bob finished
+task_1785782963_6045 | Create database schema | completed | alice | []
+task_1785782965_5865 | Write API routes | in_progress | alice | ['task_1785782963_6045']
+task_1785782965_9477 | Write unit tests | in_progress | alice | []
+---mailboxes---
+lead.jsonl 110
+> check_inbox
+  [bob] [result] Done.
+> bash
+  [idle] alice timeout (60s)
+  [bus] alice → lead: (result) Now let me write `test_api.py` covering the API ro
+  [teammate] alice finished
+task_1785782963_6045 | Create database schema | completed | alice | []
+task_1785782965_5865 | Write API routes | in_progress | alice | ['task_1785782963_6045']
+task_1785782965_9477 | Write unit tests | in_progress | alice | []
+---mailboxes---
+lead.jsonl 162
+> check_inbox
+  [alice] [result] Now let me write `test_api.py` covering the API routes:
+> bash
+--- api.py head ---
+#!/usr/bin/env python3
+"""
+api.py - REST endpoints for users and orders.
+A minimal REST API backed by SQLite, built on the Python standard library
+(http.server + sqlite3). The schema is loaded from schema.sql.
+Endpoints:
+  GET    /users          -> list users
+  POST   /users
+> complete_task
+  [complete] Write API routes ✓
+Completed task_1785782965_5865 (Write API routes)
+> complete_task
+  [complete] Write unit tests ✓
+Completed task_1785782965_9477 (Write unit tests)
+> list_tasks
+  task_1785782963_6045: Create database schema [completed]
+  task_1785782965_5865: Write API routes [completed]
+  task_1785782965_9477: Write unit tests [completed]
+Done — all 3 tasks are now completed. Here's what happened:
+## What I did
+**1. Reset the board** (it had stale tasks from a prior run) and **created 3 tasks**, including one with a `blockedBy` dependency to exercise the dependency-unlock logic:
+| Task | Depends on |
+|---|---|
+| Create database schema | — |
+| Write API routes | schema task |
+| Write unit tests | — |
+**2. Spawned alice and bob** as autonomous backend agents with instructions to claim and work through the board.
+## What I watched
+**Auto-claiming worked exactly as designed:**
+- **alice** auto-claimed *Create database schema* → wrote `schema.sql` → completed it
+- **bob** auto-claimed *Write unit tests*
+- **alice** then auto-claimed *Write API routes* — which was `blockedBy` the schema task and only became claimable **after** the schema was completed (the `can_start` dependency check doing its job)
+**Real-world quirk observed:** the agents' LLM turns sometimes end *after writing the file but before calling `complete_task`*, so tasks sat `in_progress` even though deliverables existed. Both agents also idled out (60s timeout) and sent their summaries to the Lead inbox. I handled this by:
+- resetting the two unfinished tasks to `pending` and re-spawning the agents (second run: alice claimed both, wrote `api.py` + `test_api.py`)
+- verifying the deliverables, then completing the tasks to reflect the actual finished work
+## Final board
+```
+  task_...6045: Create database schema [completed]  → schema.sql
+  task_...5865: Write API routes       [completed]  → api.py (13 KB, REST + SQLite)
+  task_...9477: Write unit tests       [completed]  → test_api.py (8 KB, unittest)
+```
+The core lesson of s17 is demonstrated: teammates poll the board in IDLE, scan for unclaimed/startable tasks, and claim them themselves — no manual Lead assignment needed. The main instability was LLM stop-conditions, not the auto-claim mechanism.
+s17 >>
